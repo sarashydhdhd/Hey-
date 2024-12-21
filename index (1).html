@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Photo Capture</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #video {
+      width: 100%;
+      max-width: 600px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+    #canvas {
+      display: none;
+      margin-top: 20px;
+    }
+    #buttons {
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 5px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #ddd;
+    }
+  </style>
+</head>
+<body>
+  <h1>Secure Photo Capture</h1>
+  <video id="video" autoplay></video>
+  <canvas id="canvas"></canvas>
+  <div id="buttons">
+    <button id="capture">Capture Photo</button>
+    <button id="download" style="display:none;">Download Photo</button>
+  </div>
+
+  <script>
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const captureButton = document.getElementById("capture");
+    const downloadButton = document.getElementById("download");
+
+    // Request access to the camera
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+      } catch (error) {
+        alert("Camera access denied or not available.");
+        console.error(error);
+      }
+    }
+
+    // Capture the photo
+    captureButton.addEventListener("click", () => {
+      const context = canvas.getContext("2d");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Show the canvas and download button
+      canvas.style.display = "block";
+      downloadButton.style.display = "inline";
+
+      // Set up the download link
+      const photoData = canvas.toDataURL("image/png");
+      downloadButton.href = photoData;
+      downloadButton.download = `secure_photo_${Date.now()}.png`;
+    });
+
+    // Start the camera when the page loads
+    window.onload = startCamera;
+  </script>
+</body>
+</html>
